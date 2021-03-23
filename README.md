@@ -1,4 +1,4 @@
-# Color picker
+# Color picker 🎨
 This is a web app that lets you create color palettes.
 
 ## Technologies used
