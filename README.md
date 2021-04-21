@@ -17,6 +17,6 @@ To run the app locally:
 - Start up parcel and typescript with `npm start`. 
 - *Optional* You can start up parcel without type checking with `npm run serve`.
 
-To prepare deployment build use `npm run buil`.
+To prepare deployment build use `npm run build`.
 
 To remove dist folder use `npm run clean`.
