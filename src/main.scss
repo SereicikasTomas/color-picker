@@ -18,3 +18,9 @@ body {
 svg {
   pointer-events: none;
 }
+
+.colors {
+  min-height: 80vh;
+  display: flex;
+  color: blue;
+}
