@@ -84,9 +84,10 @@ svg {
     width: 80%;
     border-radius: var(--border-radius) 0 var(--border-radius)
       var(--border-radius);
-    transform: translateY(0);
-    transition: all 0.5s ease-in-out;
+    opacity: 0;
+    transform: translateY(100%);
     pointer-events: none;
+    transition: all 0.5s ease-in-out;
 
     &.active {
       opacity: 1;
