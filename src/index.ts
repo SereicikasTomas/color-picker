@@ -18,13 +18,31 @@ function generateHexCode(): string {
  * Set hex values as background color to color divs and names
  */
 function randomColors() {
-  colors.forEach((curr, index) => {
-    const hexText = curr.firstElementChild as HTMLElement;
+  colors.forEach((current, index) => {
+    const constrolButtons = current.children[1].querySelectorAll('.color__button') as NodeListOf<HTMLElement>;
+    const hexText = current.firstElementChild as HTMLElement;
     const randomColor = generateHexCode();
 
-    curr.style.backgroundColor = randomColor;
+    // Change background to generated color
+    current.style.backgroundColor = randomColor;
+
+    // Change name to generated color
     hexText.innerText = randomColor;
+
+    // Adjust the color of text and icons to be more visible
+    checkContrast(randomColor, hexText, constrolButtons);
   });
+}
+
+/**
+ * Checks how bright or dark the color is and adjust the color of text and buttons accordingly
+ */
+function checkContrast(hex: string, text: HTMLElement, buttons: NodeListOf<HTMLElement>) {
+  const luminance = chroma(hex).luminance();
+  const color = luminance > 0.5 ? 'var(--black)' : 'var(--white)';
+  
+  text.style.color = color;
+  buttons.forEach((button) => (button.style.fill = color));
 }
 
 randomColors();
