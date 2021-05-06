@@ -31,6 +31,18 @@ function generateHexCode(): string {
 }
 
 /**
+ * Takes in color div HTMLElement and returns it's three color sliders
+ * @returns [hueSlider, brightnessSlider, saturationSlider]
+ */
+function getColorSliders(colorDiv: HTMLElement) {
+  const hueSlider = colorDiv.querySelector('.hue-input') as HTMLInputElement;
+  const brightnessSlider = colorDiv.querySelector('.bright-input') as HTMLInputElement;
+  const saturationSlider = colorDiv.querySelector('.sat-input') as HTMLInputElement;
+
+  return [hueSlider, brightnessSlider, saturationSlider];
+}
+
+/**
  * Set hex values as background color to color divs and names
  */
 function randomColors() {
