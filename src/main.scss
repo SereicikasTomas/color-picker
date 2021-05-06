@@ -94,6 +94,23 @@ svg {
       transform: translateY(0px);
       pointer-events: all;
     }
+
+    input[type='range'] {
+      appearance: none;
+      margin: 1rem 0;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 2px solid var(--black);
+        background: var(--white);
+        cursor: pointer;
+        border-radius: 50%;
+      }
+    }
   }
 }
 
