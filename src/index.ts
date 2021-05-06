@@ -5,14 +5,13 @@ const colors = document.querySelectorAll('.color') as NodeListOf<HTMLElement>;
 const generateButton = document.querySelector('.panel__button--generate') as HTMLButtonElement;
 const sliders = document.querySelectorAll('input[type="range"]') as NodeListOf<HTMLInputElement>;
 const colorHeaders = document.querySelectorAll('.color__header') as NodeListOf<HTMLElement>;
+const popupCopy = document.querySelector('.background--copy') as HTMLElement;
 const getControlButtons = (colorDiv: HTMLElement) =>
   colorDiv.children[1].querySelectorAll('.color__button') as NodeListOf<HTMLElement>;
 const initialColors: string[] = [];
 
 // Events
-generateButton.addEventListener('click', () => {
-  randomColors();
-});
+generateButton.addEventListener('click', () => randomColors());
 
 sliders.forEach((slider) => slider.addEventListener('input', sliderControls));
 
@@ -21,6 +20,12 @@ colors.forEach((color, index) => {
     updateTextUI(index);
   });
 });
+
+colorHeaders.forEach((header) => {
+  header.addEventListener('click', () => copyToClipboard(header.innerText));
+});
+
+popupCopy.addEventListener('transitionend', () => popupCopy.classList.remove('active'));
 
 /**
  * Generates random hex value for color
@@ -164,6 +169,20 @@ function updateTextUI(index: number) {
 
   currentHeader.innerText = hexColor;
   checkContrast(hexColor, currentHeader, controlButtons);
+}
+
+/**
+ * Copies hex value to clipboard
+ */
+function copyToClipboard(hex: string) {
+  const textArea = document.createElement('textarea');
+  textArea.value = hex;
+  document.body.appendChild(textArea);
+  textArea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textArea);
+
+  popupCopy.classList.add('active');
 }
 
 randomColors();
