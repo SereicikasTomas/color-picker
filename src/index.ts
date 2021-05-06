@@ -3,8 +3,24 @@ import chroma, { rgb } from 'chroma-js';
 // Selectors
 const colors = document.querySelectorAll('.color') as NodeListOf<HTMLElement>;
 const generateButton = document.querySelector('.panel__button--generate') as HTMLButtonElement;
-const sliders = document.querySelectorAll('input[type="range"]') as NodeListOf<HTMLElement>;
-const colorHex = document.querySelectorAll('.color__header') as NodeListOf<HTMLElement>;
+const sliders = document.querySelectorAll('input[type="range"]') as NodeListOf<HTMLInputElement>;
+const colorHeaders = document.querySelectorAll('.color__header') as NodeListOf<HTMLElement>;
+const getControlButtons = (colorDiv: HTMLElement) =>
+  colorDiv.children[1].querySelectorAll('.color__button') as NodeListOf<HTMLElement>;
+const initialColors: string[] = [];
+
+// Events
+generateButton.addEventListener('click', () => {
+  randomColors();
+});
+
+sliders.forEach((slider) => slider.addEventListener('input', sliderControls));
+
+colors.forEach((color, index) => {
+  color.addEventListener('change', () => {
+    updateTextUI(index);
+  });
+});
 
 /**
  * Generates random hex value for color
