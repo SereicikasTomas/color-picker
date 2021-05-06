@@ -8,6 +8,9 @@ const colorHeaders = document.querySelectorAll('.color__header') as NodeListOf<H
 const popupCopy = document.querySelector('.background--copy') as HTMLElement;
 const getControlButtons = (colorDiv: HTMLElement) =>
   colorDiv.children[1].querySelectorAll('.color__button') as NodeListOf<HTMLElement>;
+const adjustButtons = document.querySelectorAll('.color__button--adjust') as NodeListOf<HTMLElement>;
+const sliderCloseButtons = document.querySelectorAll('.color__button--close') as NodeListOf<HTMLButtonElement>;
+const sliderContainers = document.querySelectorAll('.color__sliders') as NodeListOf<HTMLElement>;
 const initialColors: string[] = [];
 
 // Events
@@ -26,6 +29,18 @@ colorHeaders.forEach((header) => {
 });
 
 popupCopy.addEventListener('transitionend', () => popupCopy.classList.remove('active'));
+
+adjustButtons.forEach((button, index) =>
+  button.addEventListener('click', () => {
+    sliderContainers[index].classList.toggle('active');
+  })
+);
+
+sliderCloseButtons.forEach((button, index) =>
+  button.addEventListener('click', () => {
+    sliderContainers[index].classList.remove('active');
+  })
+);
 
 /**
  * Generates random hex value for color
