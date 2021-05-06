@@ -50,7 +50,7 @@ function randomColors() {
     const controlButtons = getControlButtons(colorDiv);
     const hexText = colorHeaders[index] as HTMLElement;
     const randomColor = generateHexCode();
-    initialColors.push(randomColor);
+    initialColors.splice(index, 1, randomColor);
 
     // Change background to generated color
     colorDiv.style.backgroundColor = randomColor;
