@@ -1,4 +1,4 @@
-import chroma, { rgb } from 'chroma-js';
+import chroma from 'chroma-js';
 
 // Selectors
 const colors = document.querySelectorAll('.color') as NodeListOf<HTMLElement>;
@@ -17,7 +17,7 @@ generateButton.addEventListener('click', () => {
 sliders.forEach((slider) => slider.addEventListener('input', sliderControls));
 
 colors.forEach((color, index) => {
-  color.addEventListener('change', () => {
+  color.addEventListener('input', () => {
     updateTextUI(index);
   });
 });
@@ -47,9 +47,10 @@ function getColorSliders(colorDiv: HTMLElement) {
  */
 function randomColors() {
   colors.forEach((colorDiv, index) => {
-    const constrolButtons = colorDiv.children[1].querySelectorAll('.color__button') as NodeListOf<HTMLElement>;
-    const hexText = colorDiv.firstElementChild as HTMLElement;
+    const controlButtons = getControlButtons(colorDiv);
+    const hexText = colorHeaders[index] as HTMLElement;
     const randomColor = generateHexCode();
+    initialColors.push(randomColor);
 
     // Change background to generated color
     colorDiv.style.backgroundColor = randomColor;
@@ -58,14 +59,14 @@ function randomColors() {
     hexText.innerText = randomColor;
 
     // Adjust the color of text and icons to be more visible
-    checkContrast(randomColor, hexText, constrolButtons);
+    checkContrast(randomColor, hexText, controlButtons);
 
     // Initialise sliders
-    const hueSlider = colorDiv.querySelector('.hue-input') as HTMLInputElement;
-    const brightnessSlider = colorDiv.querySelector('.bright-input') as HTMLInputElement;
-    const saturationSlider = colorDiv.querySelector('.sat-input') as HTMLInputElement;
-    initialiseSliders(randomColor, hueSlider, brightnessSlider, saturationSlider);
+    const [hueSlider, brightnessSlider, saturationSlider] = getColorSliders(colorDiv);
+    setSliders(randomColor, hueSlider, brightnessSlider, saturationSlider);
   });
+
+  resetSliders();
 }
 
 /**
@@ -81,12 +82,7 @@ function checkContrast(hex: string, text: HTMLElement, buttons: NodeListOf<HTMLE
 /**
  * Set correct values for color sliders
  */
-function initialiseSliders(
-  color: string,
-  hue: HTMLInputElement,
-  brightness: HTMLInputElement,
-  saturation: HTMLInputElement
-) {
+function setSliders(color: string, hue: HTMLInputElement, brightness: HTMLInputElement, saturation: HTMLInputElement) {
   // Get least and most saturated color value
   const noSaturation = chroma(color).set('hsl.s', 0);
   const fullSaturation = chroma(color).set('hsl.s', 1);
@@ -105,9 +101,69 @@ function initialiseSliders(
   hue.style.backgroundImage = `linear-gradient(to right, #FF0000, #FFFF00, #00FF00, #00FFFF, #0000FF, #FF00FF, #FF0000)`;
 }
 
-randomColors();
+/**
+ * Gets number value of color
+ */
+const getColorHsl = (slider: HTMLInputElement, type: string): number => {
+  const index = slider.getAttribute(`data-${type}`);
+  const color = initialColors[parseInt(index as string)];
+  const value = type === 'hue' ? 0 : type === 'saturation' ? 1 : 2;
 
-// Events
-generateButton.addEventListener('click', () => {
-  randomColors();
-});
+  return chroma(color).hsl()[value];
+};
+
+/**
+ * Resets color sliders to their initial value
+ */
+function resetSliders() {
+  sliders.forEach((slider) => {
+    getColorHsl(slider, slider.name);
+
+    switch (slider.name) {
+      case 'hue': {
+        slider.value = Math.floor(getColorHsl(slider, slider.name)).toString();
+      }
+      case 'brightness':
+      case 'saturation': {
+        slider.value = (Math.floor(getColorHsl(slider, slider.name) * 100) / 100).toString();
+      }
+    }
+  });
+}
+
+/**
+ * Updates color values on slider input
+ */
+function sliderControls(e: Event) {
+  const target = e.target as HTMLInputElement;
+  const sliderIndex = target.getAttribute(`data-${target.name}`);
+  const index = parseInt(sliderIndex as string);
+  const colorDiv = colors[index] as HTMLElement;
+  const [hue, brightness, saturation] = getColorSliders(colorDiv);
+
+  // Update color values
+  const hexColor = chroma(initialColors[index])
+    .set('hsl.s', saturation.value)
+    .set('hsl.h', hue.value)
+    .set('hsl.l', brightness.value)
+    .hex();
+
+  // Set new color values
+  colorDiv.style.backgroundColor = hexColor;
+  setSliders(hexColor, hue, brightness, saturation);
+}
+
+/**
+ * Adjust color and value of color text and control buttons
+ */
+function updateTextUI(index: number) {
+  const currentColor = colors[index];
+  const currentHeader = colorHeaders[index];
+  const controlButtons = getControlButtons(currentColor);
+  const hexColor = chroma(currentColor.style.backgroundColor).hex();
+
+  currentHeader.innerText = hexColor;
+  checkContrast(hexColor, currentHeader, controlButtons);
+}
+
+randomColors();
