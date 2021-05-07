@@ -8,10 +8,11 @@ const colorHeaders = document.querySelectorAll('.color__header') as NodeListOf<H
 const popupCopy = document.querySelector('.background--copy') as HTMLElement;
 const getControlButtons = (colorDiv: HTMLElement) =>
   colorDiv.children[1].querySelectorAll('.color__button') as NodeListOf<HTMLElement>;
-const adjustButtons = document.querySelectorAll('.color__button--adjust') as NodeListOf<HTMLElement>;
+const adjustButtons = document.querySelectorAll('.color__button--adjust') as NodeListOf<HTMLButtonElement>;
+const lockButtons = document.querySelectorAll('.color__button--lock') as NodeListOf<HTMLButtonElement>;
 const sliderCloseButtons = document.querySelectorAll('.color__button--close') as NodeListOf<HTMLButtonElement>;
 const sliderContainers = document.querySelectorAll('.color__sliders') as NodeListOf<HTMLElement>;
-const initialColors: string[] = [];
+const initialColors: string[] = []; // Initial colors to use for reference when changing settings
 
 // Events
 generateButton.addEventListener('click', () => randomColors());
@@ -42,6 +43,10 @@ sliderCloseButtons.forEach((button, index) =>
   })
 );
 
+lockButtons.forEach((button, index) => {
+  button.addEventListener('click', () => lockColor(button, index));
+});
+
 /**
  * Generates random hex value for color
  */
@@ -70,6 +75,10 @@ function randomColors() {
     const controlButtons = getControlButtons(colorDiv);
     const hexText = colorHeaders[index] as HTMLElement;
     const randomColor = generateHexCode();
+
+    if (colorDiv.classList.contains('locked')) return;
+
+    // Set new colors to array for reference
     initialColors.splice(index, 1, randomColor);
 
     // Change background to generated color
@@ -198,6 +207,17 @@ function copyToClipboard(hex: string) {
   document.body.removeChild(textArea);
 
   popupCopy.classList.add('active');
+}
+
+/**
+ * Function respoonsible foor locking and unlocking color
+ */
+function lockColor(button: HTMLButtonElement, index: number) {
+  colors[index].classList.toggle('locked');
+  const useEl = button.querySelector('use') as SVGUseElement;
+  const href = useEl.href.baseVal;
+  const isLocked = colors[index].classList.contains('locked');
+  useEl.href.baseVal = isLocked ? href.replace('-open', '') : href + '-open';
 }
 
 randomColors();
