@@ -7,6 +7,18 @@
   --shadow: 0 1rem 2rem rgba(0, 0, 0, 0.3);
 }
 
+@mixin closeBtn($svgSize) {
+  position: absolute;
+  top: 0;
+  right: 0;
+  fill: var(--black);
+
+  svg {
+    height: $svgSize;
+    width: $svgSize;
+  }
+}
+
 *,
 *::after,
 *::before {
@@ -29,6 +41,12 @@ svg {
   display: block;
   height: 2.5rem;
   width: 4rem;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
 .colors {
@@ -58,9 +76,6 @@ svg {
   }
 
   &__button {
-    border: none;
-    background: none;
-    cursor: pointer;
     fill: var(--black);
 
     &:first-child {
@@ -68,15 +83,7 @@ svg {
     }
 
     &--close {
-      position: absolute;
-      top: 0;
-      right: 0;
-      fill: var(--black);
-
-      svg {
-        height: 1.5rem;
-        width: 1.5rem;
-      }
+      @include closeBtn(1.5rem);
     }
   }
 
@@ -179,6 +186,7 @@ svg {
     transform: translateY(-2rem);
     padding: 6rem 8rem;
     box-shadow: var(--shadow);
+    position: relative;
 
     h2 {
       font-size: 2.5rem;
@@ -186,6 +194,10 @@ svg {
 
     &__emoji {
       margin-top: 3rem;
+    }
+
+    &__close {
+      @include closeBtn(2.5rem);
     }
   }
 

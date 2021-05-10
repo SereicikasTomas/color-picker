@@ -6,13 +6,19 @@ const generateButton = document.querySelector('.panel__button--generate') as HTM
 const sliders = document.querySelectorAll('input[type="range"]') as NodeListOf<HTMLInputElement>;
 const colorHeaders = document.querySelectorAll('.color__header') as NodeListOf<HTMLElement>;
 const popupCopy = document.querySelector('.background--copy') as HTMLElement;
+const popupSave = document.querySelector('.background--save') as HTMLButtonElement;
+const popupLibrary = document.querySelector('.background--library') as HTMLButtonElement;
+const popupCloseButton = document.querySelectorAll('.popup__close') as NodeListOf<HTMLButtonElement>;
 const getControlButtons = (colorDiv: HTMLElement) =>
   colorDiv.children[1].querySelectorAll('.color__button') as NodeListOf<HTMLElement>;
 const adjustButtons = document.querySelectorAll('.color__button--adjust') as NodeListOf<HTMLButtonElement>;
 const lockButtons = document.querySelectorAll('.color__button--lock') as NodeListOf<HTMLButtonElement>;
 const sliderCloseButtons = document.querySelectorAll('.color__button--close') as NodeListOf<HTMLButtonElement>;
 const sliderContainers = document.querySelectorAll('.color__sliders') as NodeListOf<HTMLElement>;
+const saveButton = document.querySelector('.panel__button--save') as HTMLButtonElement;
+const libraryButton = document.querySelector('.panel__button--library') as HTMLButtonElement;
 const initialColors: string[] = []; // Initial colors to use for reference when changing settings
+const savedPalettes: object[] = [];
 
 // Events
 generateButton.addEventListener('click', () => randomColors());
@@ -46,6 +52,12 @@ sliderCloseButtons.forEach((button, index) =>
 lockButtons.forEach((button, index) => {
   button.addEventListener('click', () => lockColor(button, index));
 });
+
+saveButton.addEventListener('click', () => openPopup(popupSave));
+
+libraryButton.addEventListener('click', () => openPopup(popupLibrary));
+
+popupCloseButton.forEach((button) => button.addEventListener('click', closePopup));
 
 /**
  * Generates random hex value for color
@@ -218,6 +230,22 @@ function lockColor(button: HTMLButtonElement, index: number) {
   const href = useEl.href.baseVal;
   const isLocked = colors[index].classList.contains('locked');
   useEl.href.baseVal = isLocked ? href.replace('-open', '') : href + '-open';
+}
+
+/**
+ * Function responsible for opening the popups
+ */
+function openPopup(popup: HTMLElement) {
+  popup.classList.add('active');
+}
+
+/**
+ * Function responsible for closing the popups
+ */
+function closePopup(e: Event) {
+  const target = e.target as HTMLButtonElement;
+  const popup = target.parentNode?.parentNode as HTMLElement;
+  popup.classList.remove('active');
 }
 
 randomColors();
