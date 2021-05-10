@@ -19,6 +19,16 @@
   }
 }
 
+@mixin mainButton {
+  padding: 1rem 2rem;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  border: none;
+  fill: var(--white);
+  background: var(--accent-color);
+  color: var(--white);
+}
+
 *,
 *::after,
 *::before {
@@ -47,6 +57,22 @@ button {
   border: none;
   background: none;
   cursor: pointer;
+}
+
+input[type='text'] {
+  padding: 1rem 2rem;
+  font-size: 1.6rem;
+  border-radius: var(--border-radius);
+  color: var(--black);
+  background: var(--white);
+  border-bottom: 2px solid var(--black);
+  transition: border 100ms ease;
+
+  &:focus {
+    border: 2px solid var(--white);
+    border-bottom: 2px solid var(--accent-color);
+    outline: none;
+  }
 }
 
 .colors {
@@ -146,13 +172,8 @@ button {
   }
 
   &__button {
+    @include mainButton;
     margin: 1rem;
-    padding: 1rem 2rem;
-    cursor: pointer;
-    border-radius: var(--border-radius);
-    border: none;
-    fill: var(--white);
-    background: var(--accent-color);
   }
 
   &__text {
@@ -182,7 +203,7 @@ button {
     justify-content: space-evenly;
     align-items: center;
     border-radius: var(--border-radius);
-    transition: transform 0.7s ease;
+    transition: transform 0.5s ease;
     transform: translateY(-2rem);
     padding: 6rem 8rem;
     box-shadow: var(--shadow);
@@ -190,14 +211,22 @@ button {
 
     h2 {
       font-size: 2.5rem;
-    }
-
-    &__emoji {
-      margin-top: 3rem;
+      & ~ * {
+        margin-top: 3rem;
+      }
     }
 
     &__close {
       @include closeBtn(2.5rem);
+    }
+
+    &__input {
+      width: 100%;
+    }
+
+    &__save {
+      @include mainButton;
+      font-size: 1.6rem;
     }
   }
 
