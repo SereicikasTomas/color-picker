@@ -8,7 +8,9 @@ const colorHeaders = document.querySelectorAll('.color__header') as NodeListOf<H
 const popupCopy = document.querySelector('.background--copy') as HTMLElement;
 const popupSave = document.querySelector('.background--save') as HTMLButtonElement;
 const popupLibrary = document.querySelector('.background--library') as HTMLButtonElement;
-const popupCloseButton = document.querySelectorAll('.popup__close') as NodeListOf<HTMLButtonElement>;
+const popupCloseButtons = document.querySelectorAll('.popup__close') as NodeListOf<HTMLButtonElement>;
+const popupSaveButton = document.querySelector('.popup__save') as HTMLButtonElement;
+const popupSaveInput = document.querySelector('.popup__input') as HTMLInputElement;
 const getControlButtons = (colorDiv: HTMLElement) =>
   colorDiv.children[1].querySelectorAll('.color__button') as NodeListOf<HTMLElement>;
 const adjustButtons = document.querySelectorAll('.color__button--adjust') as NodeListOf<HTMLButtonElement>;
@@ -57,7 +59,9 @@ saveButton.addEventListener('click', () => openPopup(popupSave));
 
 libraryButton.addEventListener('click', () => openPopup(popupLibrary));
 
-popupCloseButton.forEach((button) => button.addEventListener('click', closePopup));
+popupSaveButton.addEventListener('click', savePalette);
+
+popupCloseButtons.forEach((button) => button.addEventListener('click', closePopup));
 
 /**
  * Generates random hex value for color
@@ -80,7 +84,7 @@ function getColorSliders(colorDiv: HTMLElement) {
 }
 
 /**
- * Set hex values as background color to color divs and names
+ * Set hex values as background color to color div and names
  */
 function randomColors() {
   colors.forEach((colorDiv, index) => {
@@ -102,7 +106,7 @@ function randomColors() {
     // Adjust the color of text and icons to be more visible
     checkContrast(randomColor, hexText, controlButtons);
 
-    // Initialise sliders
+    // Initialize sliders
     const [hueSlider, brightnessSlider, saturationSlider] = getColorSliders(colorDiv);
     setSliders(randomColor, hueSlider, brightnessSlider, saturationSlider);
   });
@@ -222,7 +226,7 @@ function copyToClipboard(hex: string) {
 }
 
 /**
- * Function respoonsible foor locking and unlocking color
+ * Function responsible for locking and unlocking color
  */
 function lockColor(button: HTMLButtonElement, index: number) {
   colors[index].classList.toggle('locked');
@@ -246,6 +250,43 @@ function closePopup(e: Event) {
   const target = e.target as HTMLButtonElement;
   const popup = target.parentNode?.parentNode as HTMLElement;
   popup.classList.remove('active');
+}
+
+/**
+ * Function responsible for creating and saving palette object   
+ */
+function savePalette(e: Event) {
+  e.preventDefault();
+  popupSave.classList.remove('active');
+
+  // Create values fr palette object
+  const id = new Date().getTime();
+  const name = popupSaveInput.value;
+  const colors: string[] = [];
+  colorHeaders.forEach((color) => colors.push(color.innerText));
+
+  // Set all values to object
+  const paletteObject = { id, name, colors };
+  savedPalettes.push(paletteObject);
+
+  // Don't forget to reset input value
+  popupSaveInput.value = '';
+
+  // Call function to set into local storage
+  saveToLocalStorage(paletteObject);
+}
+
+/**
+ * Function responsible for saving palettes in local storage
+ */
+function saveToLocalStorage(paletteObject: { id: number; name: string; colors: string[] }) {
+  const getPalettes = localStorage.getItem('palettes');
+
+  // Check if any palettes exist in local storage
+  const localPalettes = getPalettes ? JSON.parse(getPalettes) : [];
+  localPalettes.push(paletteObject);
+
+  localStorage.setItem('palettes', JSON.stringify(localPalettes));
 }
 
 randomColors();
