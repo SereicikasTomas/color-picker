@@ -14,6 +14,7 @@ const colorHeaders = document.querySelectorAll('.color__header') as NodeListOf<H
 const popupCopy = document.querySelector('.background--copy') as HTMLElement;
 const popupSave = document.querySelector('.background--save') as HTMLElement;
 const popupLibrary = document.querySelector('.background--library') as HTMLElement;
+const popupPalettes = document.querySelector('.popup__palettes') as HTMLElement;
 const libraryModal = popupLibrary.children[0] as HTMLElement;
 const popupCloseButtons = document.querySelectorAll('.popup__close') as NodeListOf<HTMLButtonElement>;
 const popupSaveButton = document.querySelector('.popup__save') as HTMLButtonElement;
@@ -71,24 +72,6 @@ popupSaveButton.addEventListener('click', savePalette);
 popupCloseButtons.forEach((button) => button.addEventListener('click', closePopup));
 
 libraryModal.addEventListener('click', selectPalette);
-
-/**
- * Function responsible for setting the background, text values, contrast and sliders to right values and places
- */
-function setAllValues(color: string, index: number) {
-  // Set colors to array for reference
-  initialColors.splice(index, 1, color);
-
-  // Set the background color to new color
-  colors[index].style.background = color;
-
-  // Update text and buttons of color div
-  updateTextUI(index);
-
-  //
-  const [hueSlider, brightnessSlider, saturationSlider] = getColorSliders(colors[index]);
-  setSliderBackground(color, hueSlider, brightnessSlider, saturationSlider);
-}
 
 /**
  * Generates random hex value for color
@@ -228,6 +211,24 @@ function updateTextUI(index: number) {
 }
 
 /**
+ * Function responsible for setting the background, text values, contrast and sliders to right values and places
+ */
+function setAllValues(color: string, index: number) {
+  // Set colors to array for reference
+  initialColors.splice(index, 1, color);
+
+  // Set the background color to new color
+  colors[index].style.background = color;
+
+  // Update text and buttons of color div
+  updateTextUI(index);
+
+  // Set slider values
+  const [hueSlider, brightnessSlider, saturationSlider] = getColorSliders(colors[index]);
+  setSliderBackground(color, hueSlider, brightnessSlider, saturationSlider);
+}
+
+/**
  * Copies hex value to clipboard
  */
 function copyToClipboard(hex: string) {
@@ -287,7 +288,6 @@ function customPaletteMarkup(name: string, colors: string[], id: number) {
 function savePalette(e: Event) {
   e.preventDefault();
   popupSave.classList.remove('active');
-  const modal = popupLibrary.children[0];
 
   // Create values fr palette object
   const id = new Date().getTime();
@@ -305,7 +305,7 @@ function savePalette(e: Event) {
   // Call function to set into local storage
   saveToLocalStorage(paletteObject);
 
-  modal.insertAdjacentHTML('beforeend', customPaletteMarkup(name, colors, id));
+  popupPalettes.insertAdjacentHTML('beforeend', customPaletteMarkup(name, colors, id));
 }
 
 /**
@@ -320,6 +320,21 @@ function saveToLocalStorage(paletteObject: Palette) {
   localPalettes.push(paletteObject);
 
   localStorage.setItem('palettes', JSON.stringify(localPalettes));
+}
+
+/**
+ * Function responsible for getting palettes from local localStorage
+ * And rendering them in the palette library modal
+ */
+function getFromLocalStorage() {
+  const getPalettes = localStorage.getItem('palettes');
+  // Check if any palettes exist in local storage
+  const localPalettes = getPalettes ? JSON.parse(getPalettes) : [];
+  savedPalettes.push(...localPalettes);
+
+  localPalettes.forEach((palette: Palette) =>
+    popupPalettes.insertAdjacentHTML('beforeend', customPaletteMarkup(palette.name, palette.colors, palette.id))
+  );
 }
 
 /**
@@ -344,4 +359,5 @@ function selectPalette(e: Event) {
   }
 }
 
+getFromLocalStorage();
 randomColors();
