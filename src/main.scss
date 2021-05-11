@@ -3,7 +3,7 @@
   --white: #faf8ff;
   --black: #2c2c2c;
   --grey: #e0e0e0;
-  --accent-color: #338e90;
+  --accent-color: #287c7c;
   --shadow: 0 1rem 2rem rgba(0, 0, 0, 0.3);
 }
 
@@ -44,6 +44,14 @@ html {
 body {
   font-family: 'Poppins', sans-serif;
   background: var(--white);
+}
+
+h2 {
+  font-size: 2.5rem;
+}
+
+h3 {
+  font-size: 2rem;
 }
 
 svg {
@@ -210,7 +218,6 @@ input[type='text'] {
     position: relative;
 
     h2 {
-      font-size: 2.5rem;
       & ~ * {
         margin-top: 3rem;
       }
@@ -227,6 +234,30 @@ input[type='text'] {
     &__save {
       @include mainButton;
       font-size: 1.6rem;
+    }
+
+    &__select {
+      @include mainButton;
+    }
+
+    &__palette {
+      display: flex;
+      min-width: 50rem;
+
+      h3 {
+        align-self: center;
+        margin-right: auto;
+      }
+
+      .custom-palette {
+        display: flex;
+        margin-right: 3rem;
+
+        &__color {
+          width: 5rem;
+          height: 5rem;
+        }
+      }
     }
   }
 

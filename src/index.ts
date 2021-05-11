@@ -1,13 +1,20 @@
 import chroma from 'chroma-js';
 
+interface Palette {
+  id: number;
+  name: string;
+  colors: string[];
+}
+
 // Selectors
 const colors = document.querySelectorAll('.color') as NodeListOf<HTMLElement>;
 const generateButton = document.querySelector('.panel__button--generate') as HTMLButtonElement;
 const sliders = document.querySelectorAll('input[type="range"]') as NodeListOf<HTMLInputElement>;
 const colorHeaders = document.querySelectorAll('.color__header') as NodeListOf<HTMLElement>;
 const popupCopy = document.querySelector('.background--copy') as HTMLElement;
-const popupSave = document.querySelector('.background--save') as HTMLButtonElement;
-const popupLibrary = document.querySelector('.background--library') as HTMLButtonElement;
+const popupSave = document.querySelector('.background--save') as HTMLElement;
+const popupLibrary = document.querySelector('.background--library') as HTMLElement;
+const libraryModal = popupLibrary.children[0] as HTMLElement;
 const popupCloseButtons = document.querySelectorAll('.popup__close') as NodeListOf<HTMLButtonElement>;
 const popupSaveButton = document.querySelector('.popup__save') as HTMLButtonElement;
 const popupSaveInput = document.querySelector('.popup__input') as HTMLInputElement;
@@ -20,7 +27,7 @@ const sliderContainers = document.querySelectorAll('.color__sliders') as NodeLis
 const saveButton = document.querySelector('.panel__button--save') as HTMLButtonElement;
 const libraryButton = document.querySelector('.panel__button--library') as HTMLButtonElement;
 const initialColors: string[] = []; // Initial colors to use for reference when changing settings
-const savedPalettes: object[] = [];
+const savedPalettes: Palette[] = [];
 
 // Events
 generateButton.addEventListener('click', () => randomColors());
@@ -63,6 +70,26 @@ popupSaveButton.addEventListener('click', savePalette);
 
 popupCloseButtons.forEach((button) => button.addEventListener('click', closePopup));
 
+libraryModal.addEventListener('click', selectPalette);
+
+/**
+ * Function responsible for setting the background, text values, contrast and sliders to right values and places
+ */
+function setAllValues(color: string, index: number) {
+  // Set colors to array for reference
+  initialColors.splice(index, 1, color);
+
+  // Set the background color to new color
+  colors[index].style.background = color;
+
+  // Update text and buttons of color div
+  updateTextUI(index);
+
+  //
+  const [hueSlider, brightnessSlider, saturationSlider] = getColorSliders(colors[index]);
+  setSliderBackground(color, hueSlider, brightnessSlider, saturationSlider);
+}
+
 /**
  * Generates random hex value for color
  */
@@ -88,30 +115,14 @@ function getColorSliders(colorDiv: HTMLElement) {
  */
 function randomColors() {
   colors.forEach((colorDiv, index) => {
-    const controlButtons = getControlButtons(colorDiv);
-    const hexText = colorHeaders[index] as HTMLElement;
     const randomColor = generateHexCode();
 
     if (colorDiv.classList.contains('locked')) return;
 
-    // Set new colors to array for reference
-    initialColors.splice(index, 1, randomColor);
-
-    // Change background to generated color
-    colorDiv.style.backgroundColor = randomColor;
-
-    // Change name to generated color
-    hexText.innerText = randomColor;
-
-    // Adjust the color of text and icons to be more visible
-    checkContrast(randomColor, hexText, controlButtons);
-
-    // Initialize sliders
-    const [hueSlider, brightnessSlider, saturationSlider] = getColorSliders(colorDiv);
-    setSliders(randomColor, hueSlider, brightnessSlider, saturationSlider);
+    setAllValues(randomColor, index);
   });
 
-  resetSliders();
+  setSliders();
 }
 
 /**
@@ -125,9 +136,14 @@ function checkContrast(hex: string, text: HTMLElement, buttons: NodeListOf<HTMLE
 }
 
 /**
- * Set correct values for color sliders
+ * Set correct background values for color sliders
  */
-function setSliders(color: string, hue: HTMLInputElement, brightness: HTMLInputElement, saturation: HTMLInputElement) {
+function setSliderBackground(
+  color: string,
+  hue: HTMLInputElement,
+  brightness: HTMLInputElement,
+  saturation: HTMLInputElement
+) {
   // Get least and most saturated color value
   const noSaturation = chroma(color).set('hsl.s', 0);
   const fullSaturation = chroma(color).set('hsl.s', 1);
@@ -158,9 +174,9 @@ const getColorHsl = (slider: HTMLInputElement, type: string): number => {
 };
 
 /**
- * Resets color sliders to their initial value
+ * Moves color sliders to their right place
  */
-function resetSliders() {
+function setSliders() {
   sliders.forEach((slider) => {
     getColorHsl(slider, slider.name);
 
@@ -195,7 +211,7 @@ function sliderControls(e: Event) {
 
   // Set new color values
   colorDiv.style.backgroundColor = hexColor;
-  setSliders(hexColor, hue, brightness, saturation);
+  setSliderBackground(hexColor, hue, brightness, saturation);
 }
 
 /**
@@ -252,12 +268,26 @@ function closePopup(e: Event) {
   popup.classList.remove('active');
 }
 
+function customPaletteMarkup(name: string, colors: string[], id: number) {
+  let colorElements = '';
+  colors.forEach(
+    (color) => (colorElements += `<div class="custom-palette__color" style="background-color: ${color}"></div>`)
+  );
+
+  return `<div class="popup__palette">
+      <h3>${name}</h3>
+      <div class="custom-palette">${colorElements}</div>
+      <button class="popup__select" data-id="${id}">Select</button>
+    </div>`;
+}
+
 /**
- * Function responsible for creating and saving palette object   
+ * Function responsible for creating and saving palette object
  */
 function savePalette(e: Event) {
   e.preventDefault();
   popupSave.classList.remove('active');
+  const modal = popupLibrary.children[0];
 
   // Create values fr palette object
   const id = new Date().getTime();
@@ -274,19 +304,44 @@ function savePalette(e: Event) {
 
   // Call function to set into local storage
   saveToLocalStorage(paletteObject);
+
+  modal.insertAdjacentHTML('beforeend', customPaletteMarkup(name, colors, id));
 }
 
 /**
  * Function responsible for saving palettes in local storage
  */
-function saveToLocalStorage(paletteObject: { id: number; name: string; colors: string[] }) {
+function saveToLocalStorage(paletteObject: Palette) {
   const getPalettes = localStorage.getItem('palettes');
 
   // Check if any palettes exist in local storage
   const localPalettes = getPalettes ? JSON.parse(getPalettes) : [];
+  // Add new palette too existing ones
   localPalettes.push(paletteObject);
 
   localStorage.setItem('palettes', JSON.stringify(localPalettes));
+}
+
+/**
+ * Function responsible for selecting a palette from library
+ * And setting all needed values to display it
+ */
+function selectPalette(e: Event) {
+  const target = e.target as HTMLElement;
+  const selectButton = target.closest('.popup__select') as HTMLButtonElement;
+  const id = selectButton?.dataset?.id;
+  const selectedPalette = savedPalettes.find((palette) => palette.id === parseInt(id as string))?.colors;
+
+  // Set all needed values to display color
+  selectedPalette?.forEach((color, index) => {
+    setAllValues(color, index);
+  });
+
+  // Close modal when select button is clicked
+  if (target.matches('.popup__select')) {
+    setSliders();
+    popupLibrary.classList.remove('active');
+  }
 }
 
 randomColors();
