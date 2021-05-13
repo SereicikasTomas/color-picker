@@ -285,7 +285,7 @@ input[type='text'] {
     }
 
     &__palettes {
-      height: 25rem;
+      max-height: 25rem;
       overflow: scroll;
     }
 
