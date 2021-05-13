@@ -1,5 +1,6 @@
 # Color picker 🎨
 This is a web app that lets you create color palettes.
+You can try it here: https://sereicikastomas.github.io/color-picker/
 
 ## Technologies used
 - HTML5
@@ -8,7 +9,7 @@ This is a web app that lets you create color palettes.
 - Parcel
 
 ## Screenshots
-<!-- ![Screenshot](name.png?raw=true) -->
+![Screenshot](color_screenshot.png?raw=true)
 
 ## Development
 To run the app locally:
