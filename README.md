@@ -8,6 +8,7 @@ You can try it here: https://sereicikastomas.github.io/color-picker/
 - TypeScript
 - SCSS
 - Parcel
+- chroma.js
 
 ## Screenshots
 ![Screenshot](color_screenshot.png?raw=true)
