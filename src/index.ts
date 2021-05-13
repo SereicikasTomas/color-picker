@@ -113,7 +113,7 @@ function randomColors() {
  */
 function checkContrast(hex: string, text: HTMLElement, buttons: NodeListOf<HTMLElement>) {
   const luminance = chroma(hex).luminance();
-  const color = luminance > 0.5 ? 'var(--black)' : 'var(--white)';
+  const color = luminance > 0.3 ? 'var(--black)' : 'var(--white)';
   text.style.color = color;
   buttons.forEach((button) => (button.style.fill = color));
 }
