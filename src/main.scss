@@ -1,3 +1,30 @@
+@mixin respond($breakpoint) {
+  @if ($breakpoint == phone) {
+    // 0-600px
+    @media only screen and (max-width: 37.5em) {
+      @content;
+    }
+  }
+  @if ($breakpoint == tab-port) {
+    // 600px-900px
+    @media only screen and (max-width: 56.25em) {
+      @content;
+    }
+  }
+  @if ($breakpoint == tab-land) {
+    // 900px-1200px
+    @media only screen and (max-width: 75em) {
+      @content;
+    }
+  }
+  @if ($breakpoint == big-desk) {
+    // 1800px
+    @media only screen and (min-width: 112.5em) {
+      @content;
+    }
+  }
+}
+
 :root {
   --border-radius: 1rem;
   --white: #faf8ff;
@@ -38,7 +65,19 @@
 }
 
 html {
-  font-size: 62.5%;
+  font-size: 62.5%; // 10px
+
+  @include respond(tab-land) {
+    font-size: 50%; // 8px
+  }
+
+  @include respond(tab-port) {
+    font-size: 37.5%; // 6px
+  }
+
+  @include respond(big-desk) {
+    font-size: 75%; // 12px
+  }
 }
 
 body {
@@ -86,6 +125,10 @@ input[type='text'] {
 .colors {
   min-height: 80vh;
   display: flex;
+
+  @include respond(tab-port) {
+    flex-direction: column;
+  }
 }
 
 .color {
